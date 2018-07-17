@@ -63,7 +63,7 @@ if __name__ == "__main__":
                 rList.append(rAll)
 
     print("Percent of successful episodes: " + str(sum(rList) / num_episodes) + "%")
-    print(rList)
+    #print(rList)
 
     plt.plot(rList)
     plt.plot(jList)
