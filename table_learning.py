@@ -1,42 +1,50 @@
 import gym
-import gym.spaces
 import numpy as np
+import gym.spaces
 
-if __name__ == "__main__":
-    env = gym.make('FrozenLake-v0')
+def table_Q():
+    env = gym.make("FrozenLake-v0")
 
-    #initialize the table
-    Q = np.zeros([env.observation_space.n, env.action_space.n])
+    lr = 0.8
+    gamma = 0.95
 
-    #learing parameters
-    lr = .8
-    y = .95
-    num_episodes = 2000
+    Q = np.zeros([env.observation_space.n,env.action_space.n])
+
+    episode = 2000
+    epsilon = 0.1
 
     rList = []
 
-    for i in range(num_episodes):
+    for i in range(episode):
         s = env.reset()
-        rALL = 0
-        d = False
-        j = 0
-        while j < 99:
-            j = j + 1
-            #select an action
-            a = np.argmax(Q[s,:] + np.random.randn(1, env.action_space.n)*(1./(i+1)))
+        done = False
+        rAll = 0
 
-            #get new state and reward
-            s1,r,d,_ = env.step(a)
-            #Update Q table
-            Q[s,a] = Q[s,a] + lr*(r + y*np.max(Q[s1,:]) - Q[s,a])
+        for j in range(99):
+            '''
+            if np.random.uniform() > epsilon:
+                action = np.argmax(Q[s,:])
+            else:
+                action = np.random.choice(4)
+            '''
 
-            rALL = rALL + r
+            action = np.argmax(Q[s, :] + np.random.randn(1, env.action_space.n) * (1. / (i + 1)))
+            #print(action)
+            s1, r, d, _ = env.step(action)
+
+            Q[s,action] = Q[s,action] + lr * (r + gamma*np.max(Q[s1,:]) - Q[s,action])
+
+            rAll += r
             s = s1
-            if d == True:
+
+            if done == True:
                 break
 
-        rList.append(rALL)
+        rList.append(rAll)
 
-    print("Score over time:" + str(sum(rList)/num_episodes))
-    print("Final Q")
+    print("Score over time:" + str(np.sum(rList)/episode))
+
     print(Q)
+
+if __name__ == "__main__":
+    table_Q()
